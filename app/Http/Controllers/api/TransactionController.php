@@ -16,7 +16,14 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        return new ApiResource(true, 'List Transaction', Transaction::all());
+        return new ApiResource(
+            true,
+            'List Transaction',
+            Transaction::select(['transactions.*', 'products.name as product_name'])
+                ->join('products', 'transactions.product_id', '=', 'products.id')
+                ->orderBy('transactions.transaction_date', 'asc')
+                ->get()
+        );
     }
 
     /**
@@ -38,7 +45,7 @@ class TransactionController extends Controller
      */
     public function show(string $id)
     {
-        $transaction = Transaction::find($id);
+        $transaction = Transaction::with('product')->find($id);
         if ($transaction) {
             return new ApiResource(true, 'Detail Transaction', $transaction);
         }
@@ -80,5 +87,39 @@ class TransactionController extends Controller
             return new ApiResource(true, 'Transaction Deleted', $transaction);
         }
         return new ApiResource(false, 'Transaction Not Found', []);
+    }
+
+    // public function search(Request $request)
+    // {
+    //     $orderBy = $request->input('order_by');
+
+    //     return new ApiResource(
+    //         true,
+    //         'List Transaction',
+    //         Transaction::with('product')
+    //             ->whereHas('product', function ($query) use ($request) {
+    //                 $query->where('name', 'like', '%' . $request->q . '%');
+    //             })
+    //             // ->when($orderBy, function ($query) use ($orderBy) {
+    //             //     $query->orderBy($orderBy, 'asc');
+    //             // })
+    //             ->orderBy('product.name', 'asc')
+    //             ->get()
+    //     );
+    // }
+
+    public function search(Request $request)
+    {
+        $orderBy = $request->input('order_by') ?? 'transactions.transaction_date';
+
+        return new ApiResource(
+            true,
+            'List Transaction',
+            Transaction::select(['transactions.*', 'products.name as product_name'])
+                ->join('products', 'transactions.product_id', '=', 'products.id')
+                ->where('products.name', 'like', '%' . $request->q . '%')
+                ->orderBy($orderBy, 'asc')
+                ->get()
+        );
     }
 }

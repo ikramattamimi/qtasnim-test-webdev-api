@@ -24,3 +24,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource('product', ProductController::class);
 Route::apiResource('product-type', ProductTypeController::class);
 Route::apiResource('transaction', TransactionController::class);
+
+Route::post('/transaction/search', [TransactionController::class, 'search']);
+Route::post('/product-type/compare', [ProductTypeController::class, 'compare']);

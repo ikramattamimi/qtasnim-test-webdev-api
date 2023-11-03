@@ -14,7 +14,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return new ApiResource(true, 'List Product', Product::all());
+        return new ApiResource(true, 'List Product', Product::with('product_type')->get());
     }
 
     /**

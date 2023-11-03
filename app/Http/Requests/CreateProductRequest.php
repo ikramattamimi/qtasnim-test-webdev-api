@@ -23,7 +23,7 @@ class CreateProductRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'stock' => 'required|integer',
+            'stock' => 'required|integer|min:0',
             'product_type_id' => 'required|integer|exists:product_types,id',
         ];
     }
